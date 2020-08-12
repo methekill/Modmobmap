@@ -11,8 +11,9 @@
 from __future__ import print_function
 from core.mLog import Cellslogger
 from core.mKB import *
+import os
 
-class xgoldmod(object):
+class srslte_pss(object):
     @Cellslogger
     def go2logs(self, cell):
         return cell
@@ -20,6 +21,11 @@ class xgoldmod(object):
     def parseFifo(self):
         kb = mKB()
         FIFO = kb.config['file']
+        if os.path.isfile(FIFO) == False:
+            try:
+                os.mkfifo(FIFO)
+            except:
+                pass
         if 'SM_cells' not in kb.data:
             kb.data['SM_cells'] = {}
         while True:
@@ -35,13 +41,12 @@ class xgoldmod(object):
                     for cell in isplit:
                         pcell = cell.split('=')
                         tmpcell[pcell[0]] = pcell[1]
-                    cid = tmpcell['CID'] + '-' + tmpcell['DL_UARFCN']
-                    tmpcell2[cid] = {    'PLMN' : tmpcell['PLMN'],
-                                         'RAC' : tmpcell['RAC'],
-                                         'LAC' : tmpcell['LAC'],
-                                         'type' : '3G',
-                                         'RX' : int(tmpcell['DL_UARFCN']),
-                                         'TX' : int(tmpcell['UL_UARFCN'].split('\0')[0]),
+                    cid = tmpcell['CID'] + '-' + tmpcell['DL_EARFCN']
+                    tmpcell2[cid] = {    'FREQ' : tmpcell['FREQ'],
+                                         'PLMN' : "-1",
+                                         'type' : "4G",
+                                         'eARFCN' : int(tmpcell['DL_EARFCN']),
+                                         'POWER' : tmpcell['POWER'], 
                                      }
                     self.go2logs(tmpcell2)
 

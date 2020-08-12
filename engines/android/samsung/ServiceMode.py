@@ -3,7 +3,7 @@
 #
 # ----------------------------------------------------------------------------
 # "THE BEER-WARE LICENSE" (Revision 42):
-# <sebastien.dudek(<@T>)synacktiv.com> wrote this file. As long as you retain this notice you
+# <sebastien.dudek(<@T>)penthertz.com> wrote this file. As long as you retain this notice you
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return FlUxIuS ;)
 # ----------------------------------------------------------------------------
@@ -120,7 +120,10 @@ class ServiceMode(ADBshell):
             if b'PLMN:' in s:
                 plmn = re.match(b'^.*PLMN:?\s?([\d\-]+)?\s?\_$', s).group(1)
             elif b'MCC-MNC :' in s:
-                plmn = re.match(b'^.*MCC-MNC\s:?\s?([\d\-\s]+)?\s?\_$', s).group(1)
+                try:
+                  plmn = re.match(b'^.*MCC-MNC\s:?\s?([\d\-\s]+)?\s?\_$', s).group(1)
+                except:
+                  plmn = None
             if b'CID:' in s:
                 cid = re.match(b'^.*CID:?\s?(\S+)?\s?_$', s).group(1)
             if b' TX:' in s:

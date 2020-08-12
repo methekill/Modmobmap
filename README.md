@@ -1,16 +1,16 @@
 Modmobmap
 ==========
 
-Modmobmap is a tool aimed to retrieve information of cellular networks.
-As shown in the first [presentation made at BeeRump 2018](https://www.rump.beer/2018/slides/modmobmap.pdf), this tool is able to retrieve information of 2G, 3G, 4G and more cellular network types with minimum requierement: only a phone with ServiceMode.
+Modmobmap is a tool aimed to retrieve information on cellular networks.
+As shown in the first [presentation made at BeeRump 2018](https://www.rump.beer/2018/slides/modmobmap.pdf), this tool is able to retrieve information of 2G, 3G, 4G, and more cellular network types with minimum requirement: only phone with ServiceMode.
 
-For the moment, the tool has only been tested and developped for the following devices:
+For the moment, the tool has only been tested and developed for the following devices:
 - Samsung Galaxy S3 via [xgoldmon (Modmobmap's edition)](https://github.com/FlUxIuS/xgoldmon);
 - Samsung Galaxy S4;
 - Samsung Galaxy S5;
 - Samsung Galaxy Note 2 with LTE;
 
-Moreover, as it's compatible for XGold via Modmobmap's forked of *xgoldmon*, this tools should also be able to work with devices supported by *xgoldmon* as well:
+Moreover, as it's compatible for XGold via Modmobmap's forked of *xgoldmon*, this tool should also be able to work with devices supported by *xgoldmon* as well:
 - Samsung Galaxy S4 GT-I9500 (this is the version without LTE!)
 - Samsung Galaxy Nexus GT-I9250 (has to be rooted!)
 - Samsung Galaxy S2 GT-I9100
@@ -20,6 +20,30 @@ Note that all devices should be rooted. In any other case, you will have to use 
 
 Also: Patches, or engines, for other devices are very much welcomed! ;)
 
+But this is not finished yet, Modmobmap include a GRGSM scanner to scan GSM cells with SDR. Compatible SDR devices are the same as those compatible with `gr-osmosdr` as follows:
+
+* FunCube Dongle through libgnuradio-fcd
+* FUNcube Dongle Pro+ through gr-fcdproplus
+* sysmocom OsmoSDR Devices through libosmosdr
+* Nuand LLC bladeRF through libbladeRF library
+* Great Scott Gadgets HackRF through libhackrf
+* Ettus USRP Devices through Ettus UHD library
+* Fairwaves UmTRX through Fairwaves' fork of Ettus' UHD library
+* RFSPACE SDR-IQ, SDR-IP, NetSDR (incl. X2 option)
+* RTL2832U based DVB-T dongles through librtlsdr
+* RTL-TCP spectrum server (see librtlsdr project)
+* MSi2500 based DVB-T dongles through libmirisdr
+* SDRplay RSP through SDRplay API library
+* AirSpy R820t dongles through libairspy
+
+Modmobmap is also able to scan LTE cells by wrapping srsLTE tools. The engine supports several SDR devices:
+
+* USRP
+* BladeRF
+* HackRF
+* RFSpace
+* and so on.
+
 Requirements
 -------------
 
@@ -27,17 +51,25 @@ Here are the following requirements:
 - Python 2 or 3;
 - Last Android SDK to run ADB: https://developer.android.com/studio/#downloads;
 - A compatible mobile phone;
-- A valid/unvalid SIM card (just in case to provide an IMSI number).
+- GNU Radio 3.8 with gr-gsm to scan GSM stations with Software-Defined Radio
+- A valid/invalid SIM card (just in case to provide an IMSI number).
+
+Ubuntu installation
+---------------------
+
+A `install_all-Ubuntu_20.04.sh` script installing all dependencies for all engines is available in the root directory.
+
+For other distributions, please adapt this script base on listed dependencies.
 
 How to use
 ----------
 
-The tool is provided with a quick help that shows you the required argument as follows:
+The tool is provided with quick help that shows you the required argument as follows:
 
 ```
 python modmobmap.py -h
 usage: modmobmap.py [-h] [-m MODULE] [-n NETWORKS] [-o] [-s ANDROIDSDK]
-                    [-a ATMODE] [-f FILE]
+                    [-a ATMODE] [-f FILE]Before running the engine, make sure all dependencies are installed. You can refer to the installation script 
 
 Mobile network mapping tool with cheap equipments
 
@@ -110,7 +142,7 @@ When looking for operators, an AT command is sent to the modem. If you want to s
 }
 ```
 
-Only the MCC/MNC codes are inmportant. Then you can re-launch the tool as follows:
+Only the MCC/MNC codes are important. Then you can re-launch the tool as follows:
 
 ```
 $ sudo python modmobmap.py -o   
@@ -150,9 +182,9 @@ Found 4 operator(s)
 [...]
 ```
 
-Note we have been able to detect other cells the AT command *AT+COPS* did not returned.
+Note we have been able to detect other cells the AT command *AT+COPS* did not return.
 
-A complet list of MCC and MNC codes could be retrieved anywhere on internet and in Wikipedia: https://en.wikipedia.org/wiki/Mobile_country_code
+A complete list of MCC and MNC codes could be retrieved anywhere on the internet and in Wikipedia: https://en.wikipedia.org/wiki/Mobile_country_code
 
 Focusing some operators
 ------------------------
@@ -189,7 +221,7 @@ Found 1 operator(s)
 Using Modmobmap with xgoldmon
 ------------------------------
 
-With XGold modems, the use of xgoldmon will be required. But for now, only the fork for *Modmobmap* works to retrieve exact information of cells via the DIAG interface, and could be downloaded at: https://github.com/FlUxIuS/xgoldmon
+With XGold modems, the use of xgoldmon will be required. But for now, only the fork for *Modmobmap* works to retrieve exact information of cells via the DIAG interface and could be downloaded at: https://github.com/FlUxIuS/xgoldmon
 
 Then after compiling, the tool *xgoldmon* could be started using the *-m* parameter like this:
 
@@ -204,7 +236,7 @@ $ ls
 celllog.fifo  Makefile   screenshot-mtsms-while-in-a-call.png  xgoldmon
 ```
 
-Then we can start running *Modmobmap* as follows precising the AT serial interface (*/dev/ttyACM0*) and the fifo file created by *xgoldmon* (*<xgoldmonpath/celllog.fifo*):
+Then we can start running *Modmobmap* as follows by specifying the AT serial interface (*/dev/ttyACM0*) and the FIFO file created by *xgoldmon* (*<xgoldmonpath/celllog.fifo*):
 
 ```
 $ sudo python3 modmobmap.py -f /<xgoldmon path>/celllog.fifo -m xgoldmod -a /dev/ttyACM0  -o
@@ -234,12 +266,129 @@ Found 4 operator(s)
 [...]
  ```
 
-Note that retrieving results from AT+COPS command could take a lot of time and sometime would need to restart the tool. If the tool is blocked on the operator retrieving step, please use cached or targeted operators features instead.
+Note that retrieving results from AT+COPS command could take a lot of time and sometime would need to restart the tool. If the tool is blocked on the operator retrieving step, please use cached or targeted operators' features instead.
+
+Using Modmobmap with GRGSM
+------------------------------
+
+Modmodmap can be used with `gr-gsm` to retrieve GSM cells' information with a Software-Defined Radio device compatible with OSMOSDR.
+
+To use this feature, please issue the following command:
+
+```
+$ python modmobmap.py -m grgsm -b GSM-R,GSM900
+=> Switching to GSM-R band
+[+] New cell detected [CellID/PCI-DL_freq  (****)]
+ Network type=2G
+ PLMN=****
+ ARFCN=978
+[+] New cell detected [CellID/PCI-DL_freq  (*****)]
+ Network type=2G
+ PLMN=20820
+ ARFCN=983
+[+] New cell detected [CellID/PCI-DL_freq  (*****)]
+ Network type=2G
+ PLMN=20820
+ ARFCN=1014
+[+] New cell detected [CellID/PCI-DL_freq  (*****)]
+ Network type=2G
+ PLMN=20810
+ ARFCN=79
+[+] New cell detected [CellID/PCI-DL_freq  (****)]
+ Network type=2G
+ PLMN=20810
+ ARFCN=86
+=> Switching to GSM900 band
+[+] New cell detected [CellID/PCI-DL_freq  (*****)]
+ Network type=2G
+ PLMN=20820
+ ARFCN=978
+```
+
+Using Modmobmap with srsLTE
+------------------------------
+
+Modmodmap can be used with `srsLTE` to retrieve LTE cells with a Software-Defined Radio device compatible with UHD, and Soapy drivers like the RTL-SDR.
+
+Before running the engine, make sure all dependencies are installed. You can refer to the installation script to install all appropriate dependencies. Also make sure that all submodules are pulled from the repository:
+
+```
+git submodule update --init --recursive
+```
+
+To use this feature, please issue the following command:
+
+```
+$ sudo python modmobmap.py -m srslte_pss -b 28 -g 'id=3'                                                                                                           
+
+[INFO] [UHD] linux; GNU C++ version 9.2.1 20191008; Boost_106700; UHD_4.0.0.0-531-g5fb585c3
+[INFO] [LOGGING] Fastpath logging disabled at runtime.
+[...]
+
+Found Rafael Micro R820T tuner
+Found Rafael Micro R820T tuner
+[INFO] Using format CF32.
+
+[+] New cell detected [CellID/PCI-DL_freq  (2-9383)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=9383
+[+] New cell detected [CellID/PCI-DL_freq  (95-9461)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=9461
+[+] New cell detected [CellID/PCI-DL_freq  (259-9591)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=9591
+[+] New cell detected [CellID/PCI-DL_freq  (259-9592)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=9592
+[+] New cell detected [CellID/PCI-DL_freq  (1-9593)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=9593
+[+] New cell detected [CellID/PCI-DL_freq  (1-9594)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=9594
+[...]
+^C[+] Cells save as cells_1595446203.json
+```
+
+The `g` parameters is not mandatory and is used mainly to select the right device to scan the Synchronization Signals.
+
+For NB-IoT scanning, you can use the `srslte_npss` option as follows:
+
+```
+$ sudo python modmobmap.py -m srslte_npss -b 20 -g 'id=3'
+[INFO] [UHD] linux; GNU C++ version 9.2.1 20191008; Boost_106700; UHD_4.0.0.0-531-g5fb585c3
+[INFO] [LOGGING] Fastpath logging disabled at runtime.
+
+Found Rafael Micro R820T tuner
+Found Rafael Micro R820T tuner
+[INFO] Using format CF32.
+[R82XX] PLL not locked!
+[+] New cell detected [CellID/PCI-DL_freq  (1-6200)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=6200
+[+] New cell detected [CellID/PCI-DL_freq  (1-6203)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=6203
+[+] New cell detected [CellID/PCI-DL_freq  (446-6400)]
+ Network type=4G
+ PLMN=-1
+ Downlink EARFCN=6400
+[...]
+```
 
 Saving results
 ---------------
 
-The process could be stopped any time when killing the process with a keyboard interrupt signal. Then results will be automatically save in a JSON file as follows:
+The process could be stopped at any time when killing the process with a keyboard interrupt signal. Then results will be automatically saved in a JSON file as follows:
 
 ```
 [...]
